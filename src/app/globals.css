@@ -262,3 +262,19 @@ details.mas[open] > summary { margin-bottom: var(--e-4); }
 .acceso h1 { font-size: var(--texto-l); margin-bottom: var(--e-5); }
 .acceso .boton { width: 100%; }
 .acceso__pie { text-align: center; margin-top: var(--e-5); font-size: var(--texto-s); color: var(--color-texto-2); }
+
+/* ---------------------------------------------------------------- Avisos */
+.insignia { display: inline-grid; place-items: center; min-width: 18px; height: 18px; padding: 0 5px; margin-left: 6px; border-radius: 999px; background: var(--color-acento); color: var(--color-sobre-acento); font-size: 11px; font-weight: var(--peso-fuerte); line-height: 1; vertical-align: 1px; }
+.barra-movil .insignia { margin-left: 3px; }
+.aviso-item { display: grid; grid-template-columns: auto 1fr auto; gap: var(--e-3) var(--e-4); align-items: start; padding: var(--e-4); border-bottom: 1px solid var(--color-borde); }
+.aviso-item:last-child { border-bottom: 0; }
+.aviso-item__titulo { font-weight: var(--peso-fuerte); text-decoration: none; }
+.aviso-item__titulo:hover { text-decoration: underline; }
+.canales { display: flex; gap: 6px; flex-wrap: wrap; margin-top: var(--e-2); }
+@media (max-width: 760px) { .aviso-item { grid-template-columns: auto 1fr; } .aviso-item > .acciones { grid-column: 1 / -1; } }
+.diagnostico { display: grid; gap: 0; margin: 0; }
+.diagnostico > div { display: flex; justify-content: space-between; gap: var(--e-4); padding: var(--e-3) 0; border-bottom: 1px solid var(--color-borde); }
+.diagnostico > div:last-child { border-bottom: 0; }
+.diagnostico dt { color: var(--color-texto-2); }
+.diagnostico dd { margin: 0; text-align: right; font-weight: var(--peso-medio); }
+.pasos { margin: var(--e-3) 0 0; padding-left: 1.25rem; display: grid; gap: var(--e-2); }

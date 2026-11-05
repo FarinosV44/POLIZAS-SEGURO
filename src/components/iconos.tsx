@@ -31,3 +31,4 @@ export const IconoTelefono = () => <Svg><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 
 export const IconoDocumento = () => <Svg><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8l-5-5Z" /><path d="M14 3v5h5" /></Svg>;
 export const IconoSubir = () => <Svg><path d="M12 16V4M7 9l5-5 5 5M5 20h14" /></Svg>;
 export const IconoSalir = () => <Svg><path d="M15 4h4v16h-4M10 8l-4 4 4 4M6 12h10" /></Svg>;
+export const IconoAvisos = () => <Svg><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15L6 16Z" /><path d="M10 20a2 2 0 0 0 4 0" /></Svg>;

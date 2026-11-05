@@ -13,8 +13,10 @@ Aplicación privada para gestionar las pólizas de empresas y particulares: qué
 - **Panel** con titular, tipo de seguro, prima anual, recibo y periodicidad, vencimiento y días restantes; filtros combinables, búsqueda, orden y totales por moneda. Tabla en escritorio y tarjetas en móvil.
 - **Documentos** privados por póliza y anualidad (PDF e imágenes), con vista y descarga autorizadas.
 - Identidad visual del grupo (ver `docs/MARCA.md`).
+- **Avisos** un mes natural antes del vencimiento, antes del plazo de oposición confirmado, recordatorio y póliza vencida; centro de avisos con reconocer, posponer y «en negociación»; worker sin depender de visitas, con cola idempotente y reintentos (ver `docs/AVISOS.md`).
+- **App instalable** (PWA) con notificaciones push en iPhone (iOS ≥ 16.4, instalada) y Android, pantalla «Avisos en este móvil» con prueba y diagnóstico, correo de respaldo y estado del servicio. *Push y correo requieren configurar sus credenciales; la prueba en dispositivo real está pendiente.*
 
-Pendiente: lectura automática de documentos (#2), avisos y app instalable con push (#4, #5), renegociación (#6), siniestros (#7), copias y exportación (#8), despliegue (#9).
+Pendiente: lectura automática de documentos (#2), renegociación (#6), siniestros (#7), copias y exportación (#8), validación y despliegue (#9).
 
 ## Arranque local
 
@@ -26,6 +28,7 @@ cp .env.example .env            # y edita DATABASE_URL
 npm run db:migrate
 npm run usuario:crear -- --email tu@correo.es --nombre "Tu nombre"   # pide la contraseña
 npm run dev                     # http://localhost:3000
+npm run worker                  # en otra terminal: avisos y envíos
 ```
 
 Datos de demostración **sintéticos** (solo en una base de datos vacía de pruebas):
@@ -43,8 +46,10 @@ DEMO_PERMITIDA=1 npm run demo:sintetica    # demo@ejemplo.test / demo-sintetica-
 | `STORAGE_DIR` | Sí | Carpeta privada de documentos, fuera de `public/` y con copia de seguridad |
 | `MAX_UPLOAD_MB` | No (25) | Tamaño máximo por documento |
 | `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD`, `SMTP_FROM` | No | Correo de recuperación y avisos de respaldo; sin ellos aparece «sin configurar» |
+| `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT` | Para push | Notificaciones (`npx web-push generate-vapid-keys`) |
+| `CRON_SECRET` | No | Activa `POST /api/tareas/avisos` como alternativa al worker |
 
-Las de push e IA están en `.env.example` y se usarán en las próximas entregas.
+La de IA está en `.env.example` y se usará en las próximas entregas. Despliegue de referencia con Docker Compose (web + worker + PostgreSQL + Caddy con HTTPS): `docker-compose.yml`.
 
 ## Comprobaciones
 
@@ -59,5 +64,6 @@ npx playwright test      # interfaz, accesibilidad (axe) y capturas con CAPTURAS
 
 - `docs/ARQUITECTURA.md` — decisiones técnicas y modelo de datos.
 - `docs/SEGURIDAD.md` — medidas de protección, retención y pendientes.
+- `docs/AVISOS.md` — reglas, worker, canales y requisitos de iPhone/Android.
 - `docs/MARCA.md` — paleta, contraste, referencias del logotipo y archivos de marca.
 - `docs/capturas/` — capturas en móvil y escritorio con datos sintéticos.
