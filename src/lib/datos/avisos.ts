@@ -128,5 +128,6 @@ export async function estadoSistema() {
     ia: !!process.env.ANTHROPIC_API_KEY,
     copiasConfiguradas: !!process.env.COPIAS_CLAVE,
     copia,
+    copiaReciente: !!copia?.ok && Date.now() - new Date(copia.fin).getTime() < 36 * 3600_000,
   };
 }
