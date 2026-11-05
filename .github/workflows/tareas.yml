@@ -1,0 +1,25 @@
+name: Tareas programadas
+
+# Despliegue gratuito (Vercel): cada 10 minutos se llama a la tarea de avisos, que planifica, emite y envía
+# los avisos y procesa las lecturas y análisis pendientes, aunque nadie abra la web.
+# Requiere: variable de repositorio APP_URL (https://…) y secreto CRON_SECRET (el mismo que en Vercel).
+# GitHub puede retrasar unos minutos las ejecuciones programadas; los avisos tienen granularidad diaria.
+on:
+  schedule:
+    - cron: '*/10 * * * *'
+  workflow_dispatch:
+
+jobs:
+  avisos:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Ejecutar la tarea de avisos
+        env:
+          APP_URL: ${{ vars.APP_URL }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          if [ -z "$APP_URL" ] || [ -z "$CRON_SECRET" ]; then echo "Sin configurar (APP_URL / CRON_SECRET): no se ejecuta."; exit 0; fi
+          codigo=$(curl -sS -o /dev/null -w '%{http_code}' --max-time 310 -X POST -H "Authorization: Bearer $CRON_SECRET" "$APP_URL/api/tareas/avisos")
+          echo "Respuesta: $codigo"
+          test "$codigo" = "200"

@@ -13,6 +13,8 @@ import { IconoDocumento, IconoRamo, IconoTelefono } from '@/components/iconos';
 import { CampoArchivo, Enviar, Formulario, Selector } from '@/components/formulario';
 import { accionEliminarDocumento, accionSubirDocumento } from '../acciones';
 import { accionRenegociar } from '../lectura-acciones';
+import { subidaDirecta } from '@/lib/almacen';
+import { SubidaDirecta } from '@/components/subida-directa';
 import { renovacionDeAnualidad } from '@/lib/datos/renovaciones';
 import { q } from '@/lib/db';
 import { ESTADOS_SINIESTRO } from '@/lib/datos/siniestros';
@@ -248,14 +250,20 @@ function Documentos({ id, documentos, anualidades }: { id: string; documentos: D
       <aside className="tarjeta tarjeta--pad" aria-labelledby="t-subir">
         <h2 id="t-subir" style={{ marginBottom: 'var(--e-4)' }}>Adjuntar documentos</h2>
         <a className="boton boton--peq boton--sutil" href={`/api/exportar/poliza/${id}`} style={{ marginBottom: 'var(--e-4)' }}>Descargar todo (ZIP)</a>
-        <Formulario accion={accionSubirDocumento.bind(null, id)} encType="multipart/form-data" aria="Adjuntar documentos">
-          <CampoArchivo nombre="archivo" etiqueta="Archivos" multiple accept="application/pdf,image/jpeg,image/png,image/webp,image/heic,.heic"
+        {subidaDirecta() ? (
+          <SubidaDirecta destino="poliza" id={id} tipos={Object.entries(TIPOS_DOCUMENTO).map(([valor, texto]) => ({ valor, texto }))} tipoDefecto="condiciones_particulares"
+            anualidades={opcionesAnualidad} anualidadDefecto={anualidades[0]?.id ?? ''}
             ayuda={`PDF o foto (JPEG, PNG, WebP, HEIC). Máximo ${Math.round(maxBytes() / 1024 / 1024)} MB por archivo.`} />
-          <Selector nombre="tipo" etiqueta="Tipo de documento" defecto="condiciones_particulares" opciones={Object.entries(TIPOS_DOCUMENTO).map(([valor, texto]) => ({ valor, texto }))} />
-          <Selector nombre="anualidad_id" etiqueta="Anualidad a la que corresponde" defecto={anualidades[0]?.id ?? ''} vacio="Sin anualidad concreta" opciones={opcionesAnualidad} />
-          <Enviar pendiente="Subiendo…">Subir</Enviar>
-          <p className="ayuda secundario pequeno">Después, abre el documento y pulsa «Leer datos» para que se propongan los datos con su página; tú los confirmas.</p>
-        </Formulario>
+        ) : (
+          <Formulario accion={accionSubirDocumento.bind(null, id)} encType="multipart/form-data" aria="Adjuntar documentos">
+            <CampoArchivo nombre="archivo" etiqueta="Archivos" multiple accept="application/pdf,image/jpeg,image/png,image/webp,image/heic,.heic"
+              ayuda={`PDF o foto (JPEG, PNG, WebP, HEIC). Máximo ${Math.round(maxBytes() / 1024 / 1024)} MB por archivo.`} />
+            <Selector nombre="tipo" etiqueta="Tipo de documento" defecto="condiciones_particulares" opciones={Object.entries(TIPOS_DOCUMENTO).map(([valor, texto]) => ({ valor, texto }))} />
+            <Selector nombre="anualidad_id" etiqueta="Anualidad a la que corresponde" defecto={anualidades[0]?.id ?? ''} vacio="Sin anualidad concreta" opciones={opcionesAnualidad} />
+            <Enviar pendiente="Subiendo…">Subir</Enviar>
+          </Formulario>
+        )}
+        <p className="ayuda secundario pequeno" style={{ marginTop: 'var(--e-3)' }}>Después, abre el documento y pulsa «Leer datos» para que se propongan los datos con su página; tú los confirmas.</p>
       </aside>
     </div>
   );

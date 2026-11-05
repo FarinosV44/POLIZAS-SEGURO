@@ -3,7 +3,8 @@
 import { redirect } from 'next/navigation';
 import { exigirUsuario } from '@/lib/auth/servidor';
 import { manejar, type EstadoForm } from '@/lib/acciones';
-import { aplicarExtraccion, descartarExtraccion, solicitarExtraccion } from '@/lib/ia/extraccion';
+import { after } from 'next/server';
+import { aplicarExtraccion, descartarExtraccion, procesarColaExtraccion, solicitarExtraccion } from '@/lib/ia/extraccion';
 import { abrirRenovacion } from '@/lib/datos/renovaciones';
 import { atenderAviso } from '@/lib/avisos/motor';
 import { q1 } from '@/lib/db';
@@ -11,6 +12,7 @@ import { q1 } from '@/lib/db';
 export async function accionLeer(polizaId: string, documentoId: string, _: EstadoForm, fd: FormData): Promise<EstadoForm> {
   return manejar(fd, async () => {
     await solicitarExtraccion(await exigirUsuario(), documentoId);
+    after(() => procesarColaExtraccion().catch((e) => console.error('[ia]', (e as Error).message)));
     redirect(`/polizas/${polizaId}/documentos/${documentoId}`);
   });
 }

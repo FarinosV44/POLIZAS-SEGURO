@@ -1,0 +1,45 @@
+name: Copia diaria cifrada
+
+# Copia cifrada (AES-256-GCM) de la base de datos y los documentos en el bucket privado de copias.
+# Requiere los secretos DATABASE_URL_COPIAS (conexión de sesión, puerto 5432), SUPABASE_URL, SUPABASE_SECRET_KEY
+# y COPIAS_CLAVE. Sin ellos no se ejecuta. Los registros no muestran datos: solo el resultado.
+on:
+  schedule:
+    - cron: '30 2 * * *'
+  workflow_dispatch:
+
+jobs:
+  copia:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL_COPIAS }}
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+      COPIAS_CLAVE: ${{ secrets.COPIAS_CLAVE }}
+      STORAGE_DRIVER: supabase
+      COPIAS_DESTINO: supabase
+      COPIAS_ESQUEMA: seguros
+      COPIAS_RETENCION_DIAS: '30'
+      PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1'
+    steps:
+      - name: Comprobar configuración
+        id: cfg
+        run: |
+          if [ -z "$DATABASE_URL" ] || [ -z "$SUPABASE_SECRET_KEY" ] || [ -z "$COPIAS_CLAVE" ]; then echo "listo=no" >> "$GITHUB_OUTPUT"; echo "Copias sin configurar: no se ejecuta."; else echo "listo=si" >> "$GITHUB_OUTPUT"; fi
+      - uses: actions/checkout@v4
+        if: steps.cfg.outputs.listo == 'si'
+      - uses: actions/setup-node@v4
+        if: steps.cfg.outputs.listo == 'si'
+        with: { node-version: 22, cache: npm }
+      - name: pg_dump 17 (misma versión que el servidor)
+        if: steps.cfg.outputs.listo == 'si'
+        run: |
+          sudo apt-get install -y -qq postgresql-common > /dev/null
+          sudo /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh -y > /dev/null
+          sudo apt-get install -y -qq postgresql-client-17 > /dev/null
+          echo "/usr/lib/postgresql/17/bin" >> "$GITHUB_PATH"
+      - if: steps.cfg.outputs.listo == 'si'
+        run: npm ci --silent
+      - if: steps.cfg.outputs.listo == 'si'
+        run: node --import tsx scripts/copia.ts

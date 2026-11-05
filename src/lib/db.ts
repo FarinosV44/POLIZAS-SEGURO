@@ -8,7 +8,7 @@ export function pool(): Pool {
   if (!global_.__pool) {
     const url = process.env.DATABASE_URL;
     if (!url) throw new Error('Falta DATABASE_URL (ver .env.example).');
-    global_.__pool = new Pool({ connectionString: url, max: Number(process.env.DB_POOL_MAX ?? 10) });
+    global_.__pool = new Pool({ connectionString: url, max: Number(process.env.DB_POOL_MAX ?? 10), idleTimeoutMillis: 10_000 });
     // Las fechas DATE se devuelven como 'YYYY-MM-DD' y no como Date (evita desfases por zona horaria).
   }
   return global_.__pool;
