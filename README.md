@@ -16,7 +16,12 @@ Aplicación privada para gestionar las pólizas de empresas y particulares: qué
 - **Avisos** un mes natural antes del vencimiento, antes del plazo de oposición confirmado, recordatorio y póliza vencida; centro de avisos con reconocer, posponer y «en negociación»; worker sin depender de visitas, con cola idempotente y reintentos (ver `docs/AVISOS.md`).
 - **App instalable** (PWA) con notificaciones push en iPhone (iOS ≥ 16.4, instalada) y Android, pantalla «Avisos en este móvil» con prueba y diagnóstico, correo de respaldo y estado del servicio. *Push y correo requieren configurar sus credenciales; la prueba en dispositivo real está pendiente.*
 
-Pendiente: lectura automática de documentos (#2), renegociación (#6), siniestros (#7), copias y exportación (#8), validación y despliegue (#9).
+- **Siniestros** con la anualidad vigente en la fecha del hecho, archivos, seguimiento, plantilla de comunicación y **asistente de cobertura** con citas comprobadas contra el PDF (ver `docs/SINIESTROS.md`).
+- **Lectura de documentos** revisable: el original junto a la propuesta, con página, cita y confianza; nada se aplica sin confirmar.
+- **Renegociación**: ofertas, comparación que señala franquicias superiores y exclusiones nuevas, borrador para el mediador y decisión (renovar, cambiar de compañía o baja).
+- *El asistente y la lectura requieren `ANTHROPIC_API_KEY`; sin ella aparecen como «sin configurar».*
+
+Pendiente: copias cifradas y exportación (#8), validación integral en despliegue real (#9).
 
 ## Arranque local
 
@@ -48,8 +53,9 @@ DEMO_PERMITIDA=1 npm run demo:sintetica    # demo@ejemplo.test / demo-sintetica-
 | `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD`, `SMTP_FROM` | No | Correo de recuperación y avisos de respaldo; sin ellos aparece «sin configurar» |
 | `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT` | Para push | Notificaciones (`npx web-push generate-vapid-keys`) |
 | `CRON_SECRET` | No | Activa `POST /api/tareas/avisos` como alternativa al worker |
+| `ANTHROPIC_API_KEY`, `ANTHROPIC_MODEL` | Para IA | Asistente de siniestros y lectura de documentos (por defecto `claude-sonnet-5-5`) |
 
-La de IA está en `.env.example` y se usará en las próximas entregas. Despliegue de referencia con Docker Compose (web + worker + PostgreSQL + Caddy con HTTPS): `docker-compose.yml`.
+Despliegue de referencia con Docker Compose (web + worker + PostgreSQL + Caddy con HTTPS): `docker-compose.yml`.
 
 ## Comprobaciones
 
@@ -64,6 +70,7 @@ npx playwright test      # interfaz, accesibilidad (axe) y capturas con CAPTURAS
 
 - `docs/ARQUITECTURA.md` — decisiones técnicas y modelo de datos.
 - `docs/SEGURIDAD.md` — medidas de protección, retención y pendientes.
+- `docs/SINIESTROS.md` — asistente, lectura de documentos y renegociación.
 - `docs/AVISOS.md` — reglas, worker, canales y requisitos de iPhone/Android.
 - `docs/MARCA.md` — paleta, contraste, referencias del logotipo y archivos de marca.
 - `docs/capturas/` — capturas en móvil y escritorio con datos sintéticos.

@@ -77,6 +77,7 @@ test('alta manual, documento privado y aislamiento sin sesión', async ({ page, 
   await expect(page.getByText('1.234,56 €')).toBeVisible();
 
   // Error de validación: conserva lo escrito
+  await page.getByRole('link', { name: /Anualidades/ }).click();
   await page.getByRole('link', { name: 'Registrar renovación' }).click();
   await page.getByLabel('Prima anual total').fill('abc');
   await page.getByRole('button', { name: 'Guardar anualidad' }).click();

@@ -12,14 +12,25 @@ import { Estado, Revisar } from '@/components/estado';
 import { IconoDocumento, IconoRamo, IconoTelefono } from '@/components/iconos';
 import { CampoArchivo, Enviar, Formulario, Selector } from '@/components/formulario';
 import { accionEliminarDocumento, accionSubirDocumento } from '../acciones';
+import { accionRenegociar } from '../lectura-acciones';
+import { renovacionDeAnualidad } from '@/lib/datos/renovaciones';
+import { q } from '@/lib/db';
+import { ESTADOS_SINIESTRO } from '@/lib/datos/siniestros';
 
 export const metadata: Metadata = { title: 'Póliza' };
 
 const PESTANAS = [
   { clave: 'resumen', texto: 'Resumen' },
+  { clave: 'condiciones', texto: 'Condiciones' },
   { clave: 'anualidades', texto: 'Anualidades e historial' },
   { clave: 'documentos', texto: 'Documentos' },
+  { clave: 'siniestros', texto: 'Siniestros' },
 ] as const;
+
+const ESTADO_DOC: Record<string, { texto: string; clase: string }> = {
+  pendiente: { texto: 'Sin leer', clase: 'neutro' }, procesando: { texto: 'Leyendo…', clase: 'proxima' },
+  revision: { texto: 'Datos por revisar', clase: 'revisar' }, confirmado: { texto: 'Datos confirmados', clase: 'vigente' }, error: { texto: 'Lectura fallida', clase: 'vencida' },
+};
 
 export default async function Ficha({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ pestana?: string; volver?: string; creada?: string }> }) {
   const { id } = await params;
@@ -32,6 +43,7 @@ export default async function Ficha({ params, searchParams }: { params: Promise<
   const actual = anualidades.find((a) => a.inicio && a.inicio <= hoy && (!a.fin || a.fin > hoy)) ?? anualidades[0];
   const { situacion: sit, dias } = situacion({ estado: p.estado, fin: actual?.fin ?? null }, hoy);
   const coste = actual ? costeAnual(actual) : null;
+  const renovacion = actual ? await renovacionDeAnualidad(actual.id) : null;
   const volverA = volver && volver.startsWith('/') && !volver.startsWith('//') ? volver : '/';
   const q = (k: string) => `/polizas/${id}?pestana=${k}${volver ? `&volver=${encodeURIComponent(volverA)}` : ''}`;
 
@@ -56,7 +68,9 @@ export default async function Ficha({ params, searchParams }: { params: Promise<
         </div>
         <div className="acciones">
           <Link className="boton" href={`/polizas/${id}/editar`}>Editar</Link>
-          <Link className="boton boton--oscuro" href={`/polizas/${id}/anualidades/nueva`}>Registrar renovación</Link>
+          <Link className="boton" href={`/siniestros/nuevo?poliza=${id}`}>Comunicar siniestro</Link>
+          {actual && renovacion ? <Link className="boton boton--oscuro" href={`/renovaciones/${renovacion.id}`}>Renegociación</Link>
+            : actual && <form action={accionRenegociar.bind(null, actual.id, undefined)}><button className="boton boton--oscuro" type="submit">Renegociar</button></form>}
         </div>
       </div>
 
@@ -99,7 +113,9 @@ export default async function Ficha({ params, searchParams }: { params: Promise<
         ))}
       </nav>
 
-      {pestana === 'anualidades' ? <Anualidades id={id} anualidades={anualidades} actualId={actual?.id} moneda={p.moneda} documentos={documentos} />
+      {pestana === 'condiciones' ? <Condiciones id={id} actual={actual} documentos={documentos} />
+        : pestana === 'siniestros' ? <SiniestrosPoliza id={id} />
+        : pestana === 'anualidades' ? <Anualidades id={id} anualidades={anualidades} actualId={actual?.id} moneda={p.moneda} documentos={documentos} />
         : pestana === 'documentos' ? <Documentos id={id} documentos={documentos} anualidades={anualidades} />
         : (
           <div className="dos-columnas">
@@ -153,6 +169,10 @@ export default async function Ficha({ params, searchParams }: { params: Promise<
 function Anualidades({ id, anualidades, actualId, moneda, documentos }: { id: string; anualidades: Anualidad[]; actualId?: string; moneda: string; documentos: Documento[] }) {
   return (
     <section className="tarjeta" aria-label="Anualidades">
+      <div className="bloque__titulo" style={{ padding: 'var(--e-4) var(--e-4) 0' }}>
+        <p className="secundario pequeno">Cada renovación es una anualidad nueva; las anteriores se conservan con sus documentos.</p>
+        <Link className="boton boton--peq boton--oscuro" href={`/polizas/${id}/anualidades/nueva`}>Registrar renovación</Link>
+      </div>
       <ul className="lista-simple">
         {anualidades.map((a, i) => {
           const c = costeAnual(a);
@@ -209,10 +229,12 @@ function Documentos({ id, documentos, anualidades }: { id: string; documentos: D
                         {TIPOS_DOCUMENTO[d.tipo]}{anualidad ? ` · ${anualidad.texto}` : ''} · {tamano(d.bytes)} · subido {fechaMedia(hoyMadrid(new Date(d.subido_en)))}
                       </p>
                       {d.duplicado_de && <p className="linea-2" style={{ color: 'var(--color-aviso-texto)' }}>Idéntico a «{d.duplicado_de}»</p>}
+                      <span className={`estado estado--${ESTADO_DOC[d.estado]?.clase ?? 'neutro'}`} style={{ marginTop: 4 }}>{ESTADO_DOC[d.estado]?.texto ?? d.estado}</span>
                     </div>
                   </div>
                   <div className="acciones">
-                    <a className="boton boton--peq" href={`/api/documentos/${d.id}?descargar=1`}>Descargar</a>
+                    <Link className="boton boton--peq" href={`/polizas/${id}/documentos/${d.id}`}>{d.estado === 'revision' ? 'Revisar datos' : 'Ver y leer'}</Link>
+                    <a className="boton boton--peq boton--sutil" href={`/api/documentos/${d.id}?descargar=1`}>Descargar</a>
                     <form action={accionEliminarDocumento.bind(null, d.id)}>
                       <button className="boton boton--peq boton--sutil" type="submit" aria-label={`Eliminar ${d.nombre_original}`}>Eliminar</button>
                     </form>
@@ -231,9 +253,55 @@ function Documentos({ id, documentos, anualidades }: { id: string; documentos: D
           <Selector nombre="tipo" etiqueta="Tipo de documento" defecto="condiciones_particulares" opciones={Object.entries(TIPOS_DOCUMENTO).map(([valor, texto]) => ({ valor, texto }))} />
           <Selector nombre="anualidad_id" etiqueta="Anualidad a la que corresponde" defecto={anualidades[0]?.id ?? ''} vacio="Sin anualidad concreta" opciones={opcionesAnualidad} />
           <Enviar pendiente="Subiendo…">Subir</Enviar>
-          <p className="ayuda secundario pequeno">La lectura automática de los datos del documento llegará en la siguiente entrega; por ahora se guardan como originales consultables.</p>
+          <p className="ayuda secundario pequeno">Después, abre el documento y pulsa «Leer datos» para que se propongan los datos con su página; tú los confirmas.</p>
         </Formulario>
       </aside>
+    </div>
+  );
+}
+
+type Item = { texto: string; documento_id?: string; pagina?: number | null; cita?: string | null };
+
+function Condiciones({ id, actual, documentos }: { id: string; actual?: Anualidad & { garantias?: Item[] | null; exclusiones?: Item[] | null; franquicias?: Item[] | null; capitales?: Item[] | null }; documentos: Documento[] }) {
+  const grupos = [['garantias', 'Garantías'], ['capitales', 'Capitales y límites'], ['franquicias', 'Franquicias'], ['exclusiones', 'Exclusiones']] as const;
+  const vacio = !actual || grupos.every(([k]) => !actual[k]?.length);
+  const faltan = [
+    !documentos.some((d) => d.tipo === 'condiciones_particulares') && 'condiciones particulares',
+    !documentos.some((d) => d.tipo === 'condiciones_generales') && 'condiciones generales',
+  ].filter(Boolean);
+  return (
+    <div style={{ display: 'grid', gap: 'var(--e-4)' }}>
+      {faltan.length > 0 && <div className="aviso aviso--atencion">Faltan las {faltan.join(' y ')}. Súbelas en «Documentos»: el asistente de siniestros las necesita.</div>}
+      {vacio ? (
+        <div className="tarjeta vacio"><h2>Sin resumen de condiciones</h2><p>Abre las condiciones en «Documentos», pulsa «Leer datos» y confirma las garantías, franquicias y exclusiones. Cada una queda enlazada a su página.</p></div>
+      ) : (
+        <div className="rejilla">
+          {grupos.filter(([k]) => actual![k]?.length).map(([k, t]) => (
+            <section key={k} className="tarjeta tarjeta--pad" aria-label={t}>
+              <h2 style={{ marginBottom: 'var(--e-3)' }}>{t}</h2>
+              <ul className="lista-puntos">
+                {actual![k]!.map((x, i) => (
+                  <li key={i}>{x.texto}{x.documento_id && x.pagina ? <> · <a className="pequeno" href={`/api/documentos/${x.documento_id}#page=${x.pagina}`} target="_blank" rel="noopener">pág. {x.pagina}</a></> : ''}</li>
+                ))}
+              </ul>
+            </section>
+          ))}
+        </div>
+      )}
+      <p className="pequeno secundario">Resumen de la anualidad actual. <Link href={`/polizas/${id}?pestana=anualidades`}>Ver otras anualidades</Link>.</p>
+    </div>
+  );
+}
+
+async function SiniestrosPoliza({ id }: { id: string }) {
+  const lista = await q<{ id: string; titulo: string; fecha_hecho: string | null; estado: keyof typeof ESTADOS_SINIESTRO }>(
+    'SELECT s.id, s.titulo, s.fecha_hecho, s.estado FROM siniestros s JOIN siniestro_polizas sp ON sp.siniestro_id = s.id WHERE sp.poliza_id = $1 AND s.archivado_en IS NULL ORDER BY s.fecha_hecho DESC NULLS LAST', [id],
+  );
+  return (
+    <div className="tarjeta">
+      {lista.length === 0 ? <div className="vacio"><h2>Sin siniestros</h2><p>Si ocurre algo, comunícalo desde aquí.</p><Link className="boton boton--principal" href={`/siniestros/nuevo?poliza=${id}`}>Comunicar siniestro</Link></div> : (
+        <ul className="lista-simple">{lista.map((s) => <li key={s.id}><div><Link href={`/siniestros/${s.id}`} style={{ fontWeight: 700 }}>{s.titulo}</Link><p className="linea-2">{s.fecha_hecho ? fechaMedia(s.fecha_hecho) : 'Fecha pendiente'}</p></div><span className="estado estado--neutro">{ESTADOS_SINIESTRO[s.estado]}</span></li>)}</ul>
+      )}
     </div>
   );
 }

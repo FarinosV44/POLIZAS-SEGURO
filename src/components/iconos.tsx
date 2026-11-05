@@ -32,3 +32,4 @@ export const IconoDocumento = () => <Svg><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0
 export const IconoSubir = () => <Svg><path d="M12 16V4M7 9l5-5 5 5M5 20h14" /></Svg>;
 export const IconoSalir = () => <Svg><path d="M15 4h4v16h-4M10 8l-4 4 4 4M6 12h10" /></Svg>;
 export const IconoAvisos = () => <Svg><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15L6 16Z" /><path d="M10 20a2 2 0 0 0 4 0" /></Svg>;
+export const IconoSiniestros = () => <Svg><rect x="5" y="3" width="14" height="18" rx="2" /><path d="M12 7.5v6M12 16.5v.5" /></Svg>;

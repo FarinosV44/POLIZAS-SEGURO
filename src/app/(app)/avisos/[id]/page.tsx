@@ -10,6 +10,8 @@ import { Campo, Enviar, Formulario } from '@/components/formulario';
 import { IconoRamo } from '@/components/iconos';
 import { Canales, tituloLista } from '../componentes';
 import { accionAtender } from '../acciones';
+import { accionRenegociar } from '../../polizas/lectura-acciones';
+import { q1 } from '@/lib/db';
 
 export const metadata: Metadata = { title: 'Aviso' };
 
@@ -18,6 +20,7 @@ export default async function Aviso({ params }: { params: Promise<{ id: string }
   const u = await exigirUsuario();
   const a = await obtenerAviso(u, id).catch((e) => { if (e instanceof NoEncontrado) notFound(); throw e; });
   const d = (await datosAviso(id))!;
+  const anualidad = (await q1<{ anualidad_id: string }>('SELECT anualidad_id FROM avisos WHERE id = $1', [id]))!.anualidad_id;
   const abierto = ['emitido', 'pospuesto', 'programado'].includes(a.estado);
   return (
     <>
@@ -51,10 +54,10 @@ export default async function Aviso({ params }: { params: Promise<{ id: string }
           <h2 id="t-acc" style={{ marginBottom: 'var(--e-4)' }}>¿Qué hacemos?</h2>
           {!abierto ? <p className="secundario">Aviso {a.estado === 'en_negociacion' ? 'en negociación' : a.estado === 'obsoleto' ? 'que ya no aplica (fechas cambiadas o póliza renovada)' : 'atendido'}.</p> : (
             <div style={{ display: 'grid', gap: 'var(--e-4)' }}>
-              <Formulario accion={accionAtender.bind(null, id)} className="" aria="Empezar a renegociar">
-                <input type="hidden" name="accion" value="negociar" />
-                <Enviar className="boton boton--principal" pendiente="Guardando…">Marcar «en negociación»</Enviar>
-              </Formulario>
+              <form action={accionRenegociar.bind(null, anualidad, id)}>
+                <button className="boton boton--principal" type="submit">Empezar a renegociar</button>
+                <p className="pequeno secundario" style={{ marginTop: 6 }}>Abre el expediente de renovación y deja de repetir este aviso.</p>
+              </form>
               <Formulario accion={accionAtender.bind(null, id)} className="form" aria="Posponer aviso">
                 <input type="hidden" name="accion" value="posponer" />
                 <Campo nombre="hasta" etiqueta="Recordármelo el" tipo="date" defecto={sumarDias(hoyMadrid(), 3)} ayuda="Posponer no cambia el vencimiento ni la fecha límite." />

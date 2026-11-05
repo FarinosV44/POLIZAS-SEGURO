@@ -19,6 +19,15 @@ Este documento describe las medidas aplicadas. **No declara cumplimiento normati
 - Pólizas y titulares se **archivan**, no se borran, para conservar el histórico de primas y siniestros.
 - Registros de intentos (`limites`) se limpian a las 48 horas; la auditoría se conserva mientras exista la aplicación salvo instrucción del responsable.
 
+## Inteligencia artificial
+
+- Proveedor configurable (`AI_PROVIDER`, por defecto Anthropic, modelo `ANTHROPIC_MODEL`); la clave (`ANTHROPIC_API_KEY`) solo existe en el servidor y nunca llega al navegador.
+- Solo se llama a la IA por acción expresa de una persona con permiso sobre el titular («Analizar», «Leer datos»). Límite de 20 operaciones por persona y día.
+- Se envía exclusivamente lo indicado en `docs/SINIESTROS.md` («Qué se envía»). Nunca se mezclan documentos de otros titulares: la selección se hace en el servidor a partir de las pólizas autorizadas del expediente.
+- Documentos y relatos se tratan como datos no confiables (instrucciones incrustadas ignoradas y señaladas).
+- Los resultados se guardan en la base de datos con la lista de documentos usados; no se registran contenidos en los registros del servidor.
+- Retención en el proveedor: la que establezcan sus condiciones de API vigentes; el responsable debe revisarlas antes de usar datos reales, en especial **información de salud** (pólizas de salud o vida). Para no usar IA basta con no configurar la clave.
+
 ## Pendiente (próximas entregas)
 
 - Copias automáticas cifradas de base de datos y documentos, retención configurable y restauración probada.

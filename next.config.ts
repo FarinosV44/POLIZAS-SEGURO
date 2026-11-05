@@ -32,7 +32,7 @@ const cabeceras = [
 const config: NextConfig = {
   poweredByHeader: false,
   output: 'standalone',
-  serverExternalPackages: ['pg'],
+  serverExternalPackages: ['pg', 'pdfjs-dist'],
   experimental: {
     serverActions: { bodySizeLimit: `${Number(process.env.MAX_UPLOAD_MB ?? 25) + 1}mb` },
   },
@@ -40,7 +40,7 @@ const config: NextConfig = {
     return [
       // Los documentos llevan sus propias cabeceras (src/app/api/documentos): se pueden previsualizar
       // dentro de la ficha (mismo origen) pero nunca desde otro sitio.
-      { source: '/((?!api/documentos/).*)', headers: cabeceras },
+      { source: '/((?!api/documentos/|api/siniestros/archivos/).*)', headers: cabeceras },
       // El service worker siempre se revisa en el servidor para que las actualizaciones lleguen enseguida.
       { source: '/sw.js', headers: [{ key: 'Cache-Control', value: 'no-cache, no-store, must-revalidate' }, { key: 'Content-Type', value: 'application/javascript; charset=utf-8' }] },
     ];

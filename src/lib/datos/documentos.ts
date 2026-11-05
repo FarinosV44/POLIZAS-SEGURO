@@ -7,6 +7,7 @@ import { almacen } from '../almacen';
 import { Invalido, NoEncontrado } from '../errores';
 import { detectarTipo, TIPOS_ADMITIDOS } from '../tipos-archivo';
 import { registrarIntento, superaLimite } from '../auth/limites';
+import { guardarTextoDocumento } from '../pdf-texto';
 
 export const TIPOS_DOCUMENTO = {
   condiciones_particulares: 'Condiciones particulares',
@@ -85,6 +86,8 @@ export async function subirDocumento(
       return id;
     });
     await registrarIntento(claveLimite, false); // cuenta para el límite
+    // Texto por página para poder verificar citas. Si falla, el documento queda guardado igualmente.
+    if (mime === 'application/pdf') await guardarTextoDocumento(id, datos).catch(() => undefined);
     return { id, duplicadoDe: duplicado?.nombre_original ?? null };
   } catch (e) {
     await almacen().borrar(clave);
