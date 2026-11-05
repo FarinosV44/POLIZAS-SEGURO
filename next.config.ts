@@ -41,6 +41,8 @@ const config: NextConfig = {
       // Los documentos llevan sus propias cabeceras (src/app/api/documentos): se pueden previsualizar
       // dentro de la ficha (mismo origen) pero nunca desde otro sitio.
       { source: '/((?!api/documentos/).*)', headers: cabeceras },
+      // El service worker siempre se revisa en el servidor para que las actualizaciones lleguen enseguida.
+      { source: '/sw.js', headers: [{ key: 'Cache-Control', value: 'no-cache, no-store, must-revalidate' }, { key: 'Content-Type', value: 'application/javascript; charset=utf-8' }] },
     ];
   },
 };

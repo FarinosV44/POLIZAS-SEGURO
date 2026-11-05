@@ -23,5 +23,5 @@ Este documento describe las medidas aplicadas. **No declara cumplimiento normati
 
 - Copias automáticas cifradas de base de datos y documentos, retención configurable y restauración probada.
 - Exportación CSV por titular y paquete de expediente con permisos.
-- Purga de archivos eliminados y limpieza de sesiones caducadas desde el worker.
+- (Hecho en la entrega 2: purga de archivos eliminados tras 30 días y limpieza de sesiones caducadas desde el worker.)
 - Política de envío a IA (qué se envía, a quién y cómo desactivarlo) cuando se integre el proveedor.

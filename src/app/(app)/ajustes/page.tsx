@@ -19,7 +19,10 @@ export default async function Ajustes() {
         <section className="bloque" aria-labelledby="t-usuarios">
           <div className="bloque__titulo">
             <h2 id="t-usuarios">Usuarios y permisos</h2>
-            <Link className="boton boton--peq" href="/ajustes/tipos">Tipos de seguro</Link>
+            <div className="acciones">
+              <Link className="boton boton--peq" href="/ajustes/estado">Estado y avisos</Link>
+              <Link className="boton boton--peq" href="/ajustes/tipos">Tipos de seguro</Link>
+            </div>
           </div>
           <div className="dos-columnas">
             <div className="tarjeta">
@@ -48,6 +51,14 @@ export default async function Ajustes() {
           </div>
         </section>
       )}
+
+      <section className="bloque" aria-labelledby="t-movil">
+        <div className="bloque__titulo"><h2 id="t-movil">Avisos</h2></div>
+        <div className="tarjeta tarjeta--pad" style={{ maxWidth: 560 }}>
+          <p className="secundario pequeno" style={{ marginBottom: 'var(--e-3)' }}>Instala la aplicación en el teléfono, activa las notificaciones y elige si quieres correo de respaldo.</p>
+          <Link className="boton" href="/avisos/dispositivo">Avisos en este móvil</Link>
+        </div>
+      </section>
 
       <section className="bloque" aria-labelledby="t-clave">
         <div className="bloque__titulo"><h2 id="t-clave">Cambiar contraseña</h2></div>

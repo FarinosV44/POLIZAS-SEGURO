@@ -9,6 +9,7 @@ import { auditar } from '@/lib/auditoria';
 import { manejar, type EstadoForm } from '@/lib/acciones';
 import { enviarCorreo, correoConfigurado } from '@/lib/correo';
 import { Invalido } from '@/lib/errores';
+import { borrarSuscripcion } from '@/lib/datos/avisos';
 
 /** Solo se aceptan destinos internos tras iniciar sesión (evita redirecciones abiertas). */
 function destinoSeguro(v: FormDataEntryValue | null) {
@@ -31,8 +32,10 @@ export async function accionAcceder(_: EstadoForm, fd: FormData): Promise<Estado
   redirect(destinoSeguro(fd.get('destino')));
 }
 
-export async function accionSalir() {
+export async function accionSalir(fd?: FormData) {
   const u = await usuarioActual();
+  const endpoint = fd?.get('endpoint');
+  if (u && typeof endpoint === 'string' && endpoint) await borrarSuscripcion(u, endpoint);
   await cerrarSesion(await tokenActual());
   await borrarCookieSesion();
   if (u) await auditar(u.id, 'salida', 'usuario', u.id);
