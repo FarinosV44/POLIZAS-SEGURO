@@ -72,7 +72,8 @@ npx playwright test      # interfaz, accesibilidad (axe) y capturas con CAPTURAS
 ## Documentación
 
 - `docs/MANUAL.md` — manual breve de uso.
-- `docs/DESPLIEGUE.md` — despliegue, salud, copias y restauración.
+- `docs/DESPLIEGUE-GRATUITO.md` — **despliegue en uso**: Vercel + Supabase + GitHub Actions, sin coste.
+- `docs/DESPLIEGUE.md` — alternativa con servidor propio (Docker), salud, copias y restauración.
 - `docs/VALIDACION.md` — criterios de aceptación por issue: evidencia y pendientes.
 - `docs/ARQUITECTURA.md` — decisiones técnicas y modelo de datos.
 - `docs/SEGURIDAD.md` — medidas de protección, retención y pendientes.

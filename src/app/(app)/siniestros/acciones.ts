@@ -10,7 +10,8 @@ import {
   actualizarSeguimiento, actualizarSiniestro, anadirEvento, crearSiniestro, elegirAnualidad, eliminarArchivoSiniestro, fijarPolizas,
   guardarBorrador, obtenerSiniestro, plantillaComunicacion, polizasDelSiniestro, subirArchivoSiniestro,
 } from '@/lib/datos/siniestros';
-import { solicitarAnalisis } from '@/lib/ia/siniestro';
+import { after } from 'next/server';
+import { procesarColaIA, solicitarAnalisis } from '@/lib/ia/siniestro';
 
 const ruta = (id: string, pestana?: string) => `/siniestros/${id}${pestana ? `?pestana=${pestana}` : ''}`;
 
@@ -47,6 +48,8 @@ export async function accionAnualidad(id: string, polizaId: string, _: EstadoFor
 export async function accionAnalizar(id: string, _: EstadoForm, fd: FormData): Promise<EstadoForm> {
   return manejar(fd, async () => {
     await solicitarAnalisis(await exigirUsuario(), id);
+    // Se procesa al momento, después de responder (sin esperar a la tarea programada, que queda de respaldo).
+    after(() => procesarColaIA().catch((e) => console.error('[ia]', (e as Error).message)));
     redirect(ruta(id, 'analisis'));
   });
 }

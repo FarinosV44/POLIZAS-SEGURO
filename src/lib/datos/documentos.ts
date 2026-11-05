@@ -52,9 +52,12 @@ export type ResultadoSubida = { id: string; duplicadoDe: string | null };
 /** Guarda un documento privado asociado a una póliza (y opcionalmente a una anualidad). */
 export async function subirDocumento(
   u: Usuario,
-  { polizaId, anualidadId, tipo, nombre, datos }: { polizaId: string; anualidadId?: string | null; tipo: string; nombre: string; datos: Buffer },
+  { polizaId, anualidadId, tipo, nombre, datos, claveExistente }: { polizaId: string; anualidadId?: string | null; tipo: string; nombre: string; datos: Buffer; claveExistente?: string },
 ): Promise<ResultadoSubida> {
   const titularId = await exigirPoliza(u, polizaId);
+  // Si el archivo ya está en el almacén (subida directa) y algo no es válido, se borra.
+  try { return await registrar(); } catch (e) { if (claveExistente) await almacen().borrar(claveExistente).catch(() => undefined); throw e; }
+  async function registrar(): Promise<ResultadoSubida> {
   if (!(tipo in TIPOS_DOCUMENTO)) throw new Invalido({ tipo: 'Elige el tipo de documento.' });
   if (datos.length === 0) throw new Invalido({ archivo: 'El archivo está vacío.' });
   if (datos.length > maxBytes()) throw new Invalido({ archivo: `El archivo supera el máximo de ${process.env.MAX_UPLOAD_MB ?? 25} MB.` });
@@ -74,7 +77,7 @@ export async function subirDocumento(
     'SELECT nombre_original FROM documentos WHERE titular_id = $1 AND sha256 = $2 AND eliminado_en IS NULL ORDER BY subido_en LIMIT 1',
     [titularId, sha256],
   );
-  const clave = await almacen().guardar(titularId, datos);
+  const clave = claveExistente ?? await almacen().guardar(titularId, datos, mime);
   try {
     const id = await transaccion(async (db) => {
       const { id } = (await q1<{ id: string }>(
@@ -92,6 +95,7 @@ export async function subirDocumento(
   } catch (e) {
     await almacen().borrar(clave);
     throw e;
+  }
   }
 }
 

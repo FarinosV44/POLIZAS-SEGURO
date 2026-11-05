@@ -14,9 +14,14 @@ import { Area, Campo, CampoArchivo, Enviar, Formulario, Importe, Selector } from
 import { BotonCopiar, Refrescar } from '@/components/copiar';
 import { IconoDocumento, IconoTelefono } from '@/components/iconos';
 import { Preparacion, Resultado, Valoracion } from './analisis';
+import { subidaDirecta } from '@/lib/almacen';
+import { SubidaDirecta } from '@/components/subida-directa';
 import {
   accionAnalizar, accionAnualidad, accionEliminarArchivo, accionEvento, accionGuardarBorrador, accionPlantilla, accionPolizas, accionSeguimiento, accionSubirArchivo,
 } from '../acciones';
+
+// El análisis o la lectura con IA se ejecutan tras responder y pueden tardar más de un minuto.
+export const maxDuration = 300;
 
 export const metadata: Metadata = { title: 'Siniestro' };
 
@@ -218,11 +223,15 @@ export default async function FichaSiniestro({ params, searchParams }: { params:
         </section>
         <aside className="tarjeta tarjeta--pad" aria-labelledby="t-subir-s">
           <h2 id="t-subir-s" style={{ marginBottom: 'var(--e-4)' }}>Añadir archivos</h2>
-          <Formulario accion={accionSubirArchivo.bind(null, id)} encType="multipart/form-data" aria="Añadir archivos">
-            <CampoArchivo nombre="archivo" etiqueta="Archivos" multiple accept="application/pdf,image/jpeg,image/png,image/webp,image/heic,.heic" ayuda="Fotos o PDF. Se guardan en el almacén privado." />
-            <Selector nombre="tipo" etiqueta="Tipo" defecto="foto" opciones={Object.entries(TIPOS_ARCHIVO_SINIESTRO).map(([valor, texto]) => ({ valor, texto }))} />
-            <Enviar pendiente="Subiendo…">Subir</Enviar>
-          </Formulario>
+          {subidaDirecta() ? (
+            <SubidaDirecta destino="siniestro" id={id} tipos={Object.entries(TIPOS_ARCHIVO_SINIESTRO).map(([valor, texto]) => ({ valor, texto }))} tipoDefecto="foto" ayuda="Fotos o PDF. Se guardan en el almacén privado." />
+          ) : (
+            <Formulario accion={accionSubirArchivo.bind(null, id)} encType="multipart/form-data" aria="Añadir archivos">
+              <CampoArchivo nombre="archivo" etiqueta="Archivos" multiple accept="application/pdf,image/jpeg,image/png,image/webp,image/heic,.heic" ayuda="Fotos o PDF. Se guardan en el almacén privado." />
+              <Selector nombre="tipo" etiqueta="Tipo" defecto="foto" opciones={Object.entries(TIPOS_ARCHIVO_SINIESTRO).map(([valor, texto]) => ({ valor, texto }))} />
+              <Enviar pendiente="Subiendo…">Subir</Enviar>
+            </Formulario>
+          )}
         </aside>
       </div>
     );

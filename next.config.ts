@@ -17,7 +17,7 @@ const cabeceras = [
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data: blob:",
       "font-src 'self'",
-      "connect-src 'self'",
+      `connect-src 'self'${process.env.STORAGE_DRIVER === 'supabase' && process.env.SUPABASE_URL ? ` ${process.env.SUPABASE_URL}` : ''}`, // subida directa al almacén privado
       "frame-src 'self'",
       "worker-src 'self'",
       "manifest-src 'self'",
@@ -31,7 +31,10 @@ const cabeceras = [
 
 const config: NextConfig = {
   poweredByHeader: false,
-  output: 'standalone',
+  // En un servidor propio (Docker) se genera la versión autónoma; Vercel usa su propio empaquetado.
+  output: process.env.VERCEL ? undefined : 'standalone',
+  // pdfjs carga su «worker» de forma dinámica: se incluye para que funcione en funciones sin servidor.
+  outputFileTracingIncludes: { '/**': ['./node_modules/pdfjs-dist/legacy/build/pdf.worker.mjs'] },
   serverExternalPackages: ['pg', 'pdfjs-dist'],
   experimental: {
     serverActions: { bodySizeLimit: `${Number(process.env.MAX_UPLOAD_MB ?? 25) + 1}mb` },

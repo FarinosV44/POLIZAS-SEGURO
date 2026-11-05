@@ -12,6 +12,9 @@ import { Enviar, Formulario } from '@/components/formulario';
 import { Refrescar } from '@/components/copiar';
 import { accionAplicar, accionDescartar, accionLeer } from '../../../lectura-acciones';
 
+// El análisis o la lectura con IA se ejecutan tras responder y pueden tardar más de un minuto.
+export const maxDuration = 300;
+
 export const metadata: Metadata = { title: 'Revisar documento' };
 
 const CONFIANZA = { alta: 'vigente', media: 'proxima', baja: 'vencida' } as const;

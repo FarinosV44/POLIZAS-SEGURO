@@ -1,0 +1,20 @@
+name: Migraciones (manual)
+
+# Aplica las migraciones pendientes de db/migrations a la base de datos de producción.
+# Se lanza a mano (Actions → Migraciones → Run workflow). Usa el secreto DATABASE_URL_COPIAS (conexión de sesión).
+on:
+  workflow_dispatch:
+
+jobs:
+  migrar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL_COPIAS }}
+      PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+      - run: npm ci --silent
+      - run: node --import tsx scripts/migrate.ts

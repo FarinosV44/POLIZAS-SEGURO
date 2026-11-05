@@ -220,14 +220,16 @@ export async function eventos(u: Usuario, id: string) {
 }
 
 // ---------------------------------------------------------------- Archivos del siniestro
-export async function subirArchivoSiniestro(u: Usuario, id: string, { tipo, nombre, datos }: { tipo: string; nombre: string; datos: Buffer }) {
+export async function subirArchivoSiniestro(u: Usuario, id: string, { tipo, nombre, datos, claveExistente }: { tipo: string; nombre: string; datos: Buffer; claveExistente?: string }) {
   const titular = await exigirSiniestro(u, id);
+  try { return await registrar(); } catch (e) { if (claveExistente) await almacen().borrar(claveExistente).catch(() => undefined); throw e; }
+  async function registrar() {
   if (!(tipo in TIPOS_ARCHIVO_SINIESTRO)) throw new Invalido({ tipo: 'Elige el tipo.' });
   if (!datos.length || datos.length > maxBytes()) throw new Invalido({ archivo: `Archivo vacío o mayor de ${process.env.MAX_UPLOAD_MB ?? 25} MB.` });
   const mime = detectarTipo(datos);
   if (!mime) throw new Invalido({ archivo: 'Formato no admitido. Sube PDF o fotos (JPEG, PNG, WebP, HEIC).' });
   if (await superaLimite(`subida:${u.id}`, 60, 60)) throw new Invalido({ archivo: 'Has subido muchos archivos seguidos. Espera unos minutos.' });
-  const clave = await almacen().guardar(titular, datos);
+  const clave = claveExistente ?? await almacen().guardar(titular, datos, mime);
   try {
     const r = (await q1<{ id: string }>(
       `INSERT INTO siniestro_archivos (siniestro_id, titular_id, tipo, nombre_original, mime, bytes, sha256, clave_almacen, subido_por)
@@ -239,6 +241,7 @@ export async function subirArchivoSiniestro(u: Usuario, id: string, { tipo, nomb
     await auditar(u.id, 'siniestro_archivo_subido', 'siniestro', id, titular, { tipo, bytes: datos.length });
     return r.id;
   } catch (e) { await almacen().borrar(clave); throw e; }
+  }
 }
 
 export async function archivosSiniestro(u: Usuario, id: string) {
