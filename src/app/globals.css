@@ -278,3 +278,19 @@ details.mas[open] > summary { margin-bottom: var(--e-4); }
 .diagnostico dt { color: var(--color-texto-2); }
 .diagnostico dd { margin: 0; text-align: right; font-weight: var(--peso-medio); }
 .pasos { margin: var(--e-3) 0 0; padding-left: 1.25rem; display: grid; gap: var(--e-2); }
+
+/* ---------------------------------------------------------------- Siniestros y análisis */
+.lista-puntos { margin: var(--e-2) 0 0; padding-left: 1.25rem; display: grid; gap: var(--e-1); }
+.bloque-cita { padding: var(--e-3) 0; border-top: 1px solid var(--color-borde); display: grid; gap: var(--e-2); }
+.citas { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--e-2); }
+.citas blockquote { margin: 0; padding: var(--e-2) var(--e-3); border-left: 3px solid var(--color-acento); background: var(--color-fondo); font-size: var(--texto-s); }
+.borrador { width: 100%; min-height: 360px; font-family: var(--fuente); font-size: var(--texto-m); line-height: 1.55; padding: var(--e-4); border: 1px solid var(--color-borde-fuerte); border-radius: var(--radio-s); background: var(--color-superficie); }
+.revision { display: grid; grid-template-columns: 1fr 1fr; gap: var(--e-5); align-items: start; }
+.revision iframe { width: 100%; height: 80vh; border: 1px solid var(--color-borde); border-radius: var(--radio); background: var(--color-superficie); position: sticky; top: 80px; }
+@media (max-width: 900px) { .revision { grid-template-columns: 1fr; } .revision iframe { height: 60vh; position: static; } }
+.fila-campo { display: grid; grid-template-columns: auto 1fr; gap: var(--e-3); padding: var(--e-3) 0; border-top: 1px solid var(--color-borde); align-items: start; }
+.fila-campo input[type="checkbox"] { width: 20px; height: 20px; margin-top: 30px; accent-color: var(--color-oscuro); }
+.comparacion { width: 100%; border-collapse: collapse; font-size: var(--texto-s); }
+.comparacion th, .comparacion td { text-align: left; vertical-align: top; padding: var(--e-3); border-bottom: 1px solid var(--color-borde); min-width: 180px; }
+.comparacion th[scope="row"] { color: var(--color-texto-2); font-weight: var(--peso-medio); min-width: 120px; }
+.desplazable { overflow-x: auto; }

@@ -2,11 +2,12 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { IconoAjustes, IconoAvisos, IconoPolizas, IconoTitulares } from './iconos';
+import { IconoAjustes, IconoAvisos, IconoPolizas, IconoSiniestros, IconoTitulares } from './iconos';
 
 const ENLACES = [
-  { href: '/', texto: 'Pólizas', icono: IconoPolizas, activo: (p: string) => p === '/' || p.startsWith('/polizas') },
+  { href: '/', texto: 'Pólizas', icono: IconoPolizas, activo: (p: string) => p === '/' || p.startsWith('/polizas') || p.startsWith('/renovaciones') },
   { href: '/avisos', texto: 'Avisos', icono: IconoAvisos, activo: (p: string) => p.startsWith('/avisos') },
+  { href: '/siniestros', texto: 'Siniestros', icono: IconoSiniestros, activo: (p: string) => p.startsWith('/siniestros') },
   { href: '/titulares', texto: 'Titulares', icono: IconoTitulares, activo: (p: string) => p.startsWith('/titulares') },
   { href: '/ajustes', texto: 'Ajustes', icono: IconoAjustes, activo: (p: string) => p.startsWith('/ajustes') },
 ];
