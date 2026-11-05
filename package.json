@@ -1,0 +1,50 @@
+{
+  "name": "praetoria-gestor-de-seguros",
+  "version": "0.1.0",
+  "private": true,
+  "description": "PRAETORIA gestor de seguros — aplicación privada para gestionar pólizas de empresas y particulares",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "db:migrate": "node --env-file-if-exists=.env --import tsx scripts/migrate.ts",
+    "usuario:crear": "node --env-file-if-exists=.env --import tsx scripts/usuario-crear.ts",
+    "demo:sintetica": "node --env-file-if-exists=.env --import tsx scripts/demo-sintetica.ts",
+    "marca": "node scripts/marca/generar.mjs",
+    "check": "npm run lint && npm run typecheck && npm test && npm run build"
+  },
+  "dependencies": {
+    "next": "^16.4.5",
+    "nodemailer": "^10.3.1",
+    "pg": "^8.23.1",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "server-only": "^0.0.1",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.14.0",
+    "@eslint/eslintrc": "^3.3.7",
+    "@fontsource/montserrat": "^5.3.0",
+    "@playwright/test": "^1.64.1",
+    "@types/node": "^26.6.6",
+    "@types/nodemailer": "^8.0.2",
+    "@types/pg": "^8.23.1",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "eslint": "^9.39.5",
+    "eslint-config-next": "^16.4.5",
+    "opentype.js": "^2.0.0",
+    "sharp": "^0.35.5",
+    "tsx": "^4.23.15",
+    "typescript": "^6.0.3",
+    "vitest": "^5.1.0"
+  }
+}

@@ -1,0 +1,61 @@
+/*
+ * PRAETORIA gestor de seguros — tokens de diseño (#11).
+ * ÚNICA fuente de la paleta y la tipografía. Las pantallas usan estas variables, nunca valores sueltos.
+ * Si cambias un color, actualiza también scripts/marca/generar.mjs y comprueba el contraste
+ * (tabla en docs/MARCA.md; prueba automática en tests/contraste.test.ts).
+ */
+:root {
+  /* Paleta de marca */
+  --color-fondo: #F9F9F9;          /* fondo base */
+  --color-oscuro: #28282B;         /* texto y elementos oscuros */
+  --color-acento: #ff4200;         /* acento: acciones principales, selección y detalles */
+
+  /* Derivados neutros */
+  --color-superficie: #FFFFFF;     /* tarjetas y formularios sobre el fondo base */
+  --color-texto: var(--color-oscuro);
+  --color-texto-2: #5E5E63;        /* texto secundario: 6,1:1 sobre el fondo */
+  --color-borde: #E3E3E6;          /* separadores (decorativo) */
+  --color-borde-fuerte: #8E8E93;   /* bordes de campos: 3,1:1 sobre el fondo */
+  --color-hover: #F1F1F2;
+
+  /* Sobre el acento se usa texto negro (6,0:1). El blanco sobre #ff4200 solo da 3,5:1 y no se usa en texto. */
+  --color-sobre-acento: #000000;
+  --color-sobre-oscuro: #F9F9F9;
+
+  /* Estados (siempre acompañados de texto o icono, nunca solo color) */
+  --color-aviso-texto: #A33100;    /* 6,4:1 sobre su fondo */
+  --color-aviso-fondo: #FFF1EB;
+  --color-peligro-texto: #B3261E;  /* 6,5:1 */
+  --color-peligro-fondo: #FDECEC;
+  --color-ok-texto: #1E6B3A;       /* 6,5:1 */
+  --color-ok-fondo: #EAF5EE;
+  --color-info-fondo: #F1F1F2;
+
+  /* Tipografía: Helvetica del sistema; no se sirve ningún archivo de fuente. */
+  --fuente: Helvetica, "Helvetica Neue", Arial, sans-serif;
+  --peso-normal: 400;
+  --peso-medio: 500;
+  --peso-fuerte: 700;
+  --texto-xs: 0.75rem;
+  --texto-s: 0.875rem;
+  --texto-m: 1rem;
+  --texto-l: 1.125rem;
+  --texto-xl: 1.5rem;
+  --texto-xxl: 2rem;
+
+  /* Espaciado y forma */
+  --e-1: 0.25rem;
+  --e-2: 0.5rem;
+  --e-3: 0.75rem;
+  --e-4: 1rem;
+  --e-5: 1.5rem;
+  --e-6: 2rem;
+  --e-7: 3rem;
+  --radio: 10px;
+  --radio-s: 6px;
+  --sombra: 0 1px 2px rgb(40 40 43 / 0.06), 0 1px 1px rgb(40 40 43 / 0.04);
+  --ancho-max: 1180px;
+  --foco: 0 0 0 2px var(--color-fondo), 0 0 0 4px var(--color-acento); /* 3,3:1 sobre el fondo */
+
+  color-scheme: light;
+}

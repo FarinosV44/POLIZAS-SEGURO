@@ -1,0 +1,49 @@
+name: Comprobaciones
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  comprobar:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: polizas
+          POSTGRES_PASSWORD: polizas
+          POSTGRES_DB: polizas_test
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U polizas" --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      DATABASE_URL_TEST: postgres://polizas:polizas@localhost:5432/polizas_test
+      PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+      # Interfaz con datos sintéticos en una base de datos aparte
+      - name: Prueba de interfaz y accesibilidad
+        env:
+          DATABASE_URL: postgres://polizas:polizas@localhost:5432/polizas_e2e
+          APP_URL: http://localhost:3000
+          STORAGE_DIR: /tmp/documentos-e2e
+          DEMO_PERMITIDA: '1'
+        run: |
+          PGPASSWORD=polizas psql -h localhost -U polizas -d polizas_test -c 'CREATE DATABASE polizas_e2e'
+          npm run db:migrate
+          npm run demo:sintetica
+          (npm start > servidor.log 2>&1 &)
+          npx wait-on -t 60000 http://localhost:3000/acceso || (cat servidor.log; exit 1)
+          npx playwright test
+      - name: Secretos en el código del navegador
+        run: |
+          if grep -rEl "(DATABASE_URL|VAPID_PRIVATE|ANTHROPIC_API_KEY|SMTP_PASSWORD|postgres://)" .next/static; then echo "Hay referencias a secretos en el bundle"; exit 1; fi
