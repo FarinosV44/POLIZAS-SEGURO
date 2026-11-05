@@ -71,7 +71,10 @@ export default async function Panel({ searchParams }: { searchParams: Promise<Bu
           <h1>Pólizas</h1>
           <p className="secundario pequeno">{filas.length} {filas.length === 1 ? 'póliza' : 'pólizas'}{hayFiltros ? ' con estos filtros' : ''}</p>
         </div>
-        <Link className="boton boton--principal" href={`/polizas/nueva${f.titular ? `?titular=${f.titular}` : ''}`}><IconoMas /> Añadir póliza</Link>
+        <div className="acciones">
+          <a className="boton boton--sutil solo-escritorio" href={`/api/exportar/polizas${f.titular ? `?titular=${f.titular}` : ''}`}>Exportar CSV</a>
+          <Link className="boton boton--principal" href={`/polizas/nueva${f.titular ? `?titular=${f.titular}` : ''}`}><IconoMas /> Añadir póliza</Link>
+        </div>
       </div>
 
       <section className="resumen" aria-label="Resumen">

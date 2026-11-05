@@ -247,6 +247,7 @@ function Documentos({ id, documentos, anualidades }: { id: string; documentos: D
       </section>
       <aside className="tarjeta tarjeta--pad" aria-labelledby="t-subir">
         <h2 id="t-subir" style={{ marginBottom: 'var(--e-4)' }}>Adjuntar documentos</h2>
+        <a className="boton boton--peq boton--sutil" href={`/api/exportar/poliza/${id}`} style={{ marginBottom: 'var(--e-4)' }}>Descargar todo (ZIP)</a>
         <Formulario accion={accionSubirDocumento.bind(null, id)} encType="multipart/form-data" aria="Adjuntar documentos">
           <CampoArchivo nombre="archivo" etiqueta="Archivos" multiple accept="application/pdf,image/jpeg,image/png,image/webp,image/heic,.heic"
             ayuda={`PDF o foto (JPEG, PNG, WebP, HEIC). Máximo ${Math.round(maxBytes() / 1024 / 1024)} MB por archivo.`} />

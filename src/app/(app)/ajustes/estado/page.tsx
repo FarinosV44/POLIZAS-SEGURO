@@ -36,7 +36,8 @@ export default async function Estado() {
             <Indicador texto="Envíos pendientes" ok={e.pendientes < 20 ? true : 'aviso'} detalle={String(e.pendientes)} />
             {e.fallidos.map((f) => <Indicador key={f.canal} texto={`Fallidos (30 días) · ${f.canal}`} ok={false} detalle={`${f.n} · ${f.error ?? ''}`.slice(0, 90)} />)}
             <Indicador texto="Asistente con IA" ok={e.ia ? true : 'aviso'} detalle={e.ia ? 'Clave configurada' : 'Sin configurar'} />
-            <Indicador texto="Copias de seguridad" ok="aviso" detalle="Pendiente de configurar (#8)" />
+            <Indicador texto="Copias de seguridad" ok={!e.copia ? 'aviso' : e.copia.ok && Date.now() - new Date(e.copia.fin).getTime() < 36 * 3600_000 ? true : e.copia.ok ? 'aviso' : false}
+              detalle={!e.copiasConfiguradas && !e.copia ? 'Sin configurar (COPIAS_CLAVE)' : !e.copia ? 'Configuradas · aún no hay ninguna' : e.copia.ok ? `Última: ${new Date(e.copia.fin).toLocaleString('es-ES', { timeZone: 'Europe/Madrid' })}` : `Fallida: ${e.copia.error}`} />
           </dl>
           {e.planificador !== 'activo' && <p className="pequeno secundario" style={{ marginTop: 'var(--e-3)' }}>El planificador lo ejecuta el proceso <code>npm run worker</code> (o el cron por HTTP). Ver docs/AVISOS.md.</p>}
         </section>
