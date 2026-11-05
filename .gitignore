@@ -1,0 +1,32 @@
+# Dependencias y compilación
+node_modules/
+.next/
+out/
+coverage/
+*.tsbuildinfo
+next-env.d.ts
+
+# Secretos y configuración local: el repositorio es PÚBLICO
+.env
+.env.*
+!.env.example
+
+# Datos reales: documentos subidos, copias, exportaciones, volcados y registros
+datos/
+almacen/
+copias/
+exportaciones/
+*.dump
+*.sql.gz
+*.sqlite
+*.log
+logs/
+
+# Pólizas o documentos que se dejen en el árbol por error
+/*.pdf
+/documentos/
+
+# Pruebas
+test-results/
+playwright-report/
+.DS_Store
