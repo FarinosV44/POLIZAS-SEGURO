@@ -60,6 +60,14 @@ export default async function Ajustes() {
         </div>
       </section>
 
+      <section className="bloque" aria-labelledby="t-export">
+        <div className="bloque__titulo"><h2 id="t-export">Exportar</h2></div>
+        <div className="tarjeta tarjeta--pad" style={{ maxWidth: 560 }}>
+          <p className="secundario pequeno" style={{ marginBottom: 'var(--e-3)' }}>Pólizas y anualidades de los titulares a los que tienes acceso, en CSV para Excel. El expediente completo de cada póliza o siniestro se descarga desde su ficha.</p>
+          <a className="boton" href="/api/exportar/polizas">Descargar pólizas (CSV)</a>
+        </div>
+      </section>
+
       <section className="bloque" aria-labelledby="t-clave">
         <div className="bloque__titulo"><h2 id="t-clave">Cambiar contraseña</h2></div>
         <div className="tarjeta tarjeta--pad" style={{ maxWidth: 560 }}>

@@ -118,6 +118,7 @@ export async function estadoSistema() {
   );
   const pendientes = await q1<{ n: string }>(`SELECT count(*) n FROM envios WHERE estado = 'pendiente'`);
   const subs = await q1<{ n: string }>(`SELECT count(*) n FROM push_suscripciones WHERE revocada_en IS NULL`);
+  const copia = await q1<{ fin: Date; ok: boolean; error: string | null; resumen: { archivo?: string; bytes?: number } | null }>(`SELECT fin, ok, error, resumen FROM ejecuciones WHERE tarea = 'copia' ORDER BY id DESC LIMIT 1`);
   const minutos = ultimaOk ? (Date.now() - new Date(ultimaOk.fin).getTime()) / 60000 : null;
   return {
     planificador: minutos === null ? 'nunca' as const : minutos <= 20 ? 'activo' as const : 'detenido' as const,
@@ -125,5 +126,8 @@ export async function estadoSistema() {
     ultima, fallidos, pendientes: Number(pendientes?.n ?? 0), suscripciones: Number(subs?.n ?? 0),
     push: pushConfigurado(), correo: correoConfigurado(),
     ia: !!process.env.ANTHROPIC_API_KEY,
+    copiasConfiguradas: !!process.env.COPIAS_CLAVE,
+    copia,
+    copiaReciente: !!copia?.ok && Date.now() - new Date(copia.fin).getTime() < 36 * 3600_000,
   };
 }

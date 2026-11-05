@@ -21,7 +21,9 @@ Aplicación privada para gestionar las pólizas de empresas y particulares: qué
 - **Renegociación**: ofertas, comparación que señala franquicias superiores y exclusiones nuevas, borrador para el mediador y decisión (renovar, cambiar de compañía o baja).
 - *El asistente y la lectura requieren `ANTHROPIC_API_KEY`; sin ella aparecen como «sin configurar».*
 
-Pendiente: copias cifradas y exportación (#8), validación integral en despliegue real (#9).
+- **Copias cifradas** diarias (base de datos + documentos, AES-256-GCM) con retención y restauración probada; **exportación** CSV y ZIP por póliza o siniestro con permisos; `/api/salud`.
+
+Pendiente: despliegue real, credenciales externas y pruebas en dispositivos (ver `docs/VALIDACION.md`).
 
 ## Arranque local
 
@@ -53,6 +55,7 @@ DEMO_PERMITIDA=1 npm run demo:sintetica    # demo@ejemplo.test / demo-sintetica-
 | `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD`, `SMTP_FROM` | No | Correo de recuperación y avisos de respaldo; sin ellos aparece «sin configurar» |
 | `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT` | Para push | Notificaciones (`npx web-push generate-vapid-keys`) |
 | `CRON_SECRET` | No | Activa `POST /api/tareas/avisos` como alternativa al worker |
+| `COPIAS_CLAVE`, `COPIAS_DIR`, `COPIAS_RETENCION_DIAS`, `COPIAS_HORA` | Para copias | Copia diaria cifrada desde el worker (`openssl rand -base64 32`) |
 | `ANTHROPIC_API_KEY`, `ANTHROPIC_MODEL` | Para IA | Asistente de siniestros y lectura de documentos (por defecto `claude-sonnet-5-5`) |
 
 Despliegue de referencia con Docker Compose (web + worker + PostgreSQL + Caddy con HTTPS): `docker-compose.yml`.
@@ -68,6 +71,9 @@ npx playwright test      # interfaz, accesibilidad (axe) y capturas con CAPTURAS
 
 ## Documentación
 
+- `docs/MANUAL.md` — manual breve de uso.
+- `docs/DESPLIEGUE.md` — despliegue, salud, copias y restauración.
+- `docs/VALIDACION.md` — criterios de aceptación por issue: evidencia y pendientes.
 - `docs/ARQUITECTURA.md` — decisiones técnicas y modelo de datos.
 - `docs/SEGURIDAD.md` — medidas de protección, retención y pendientes.
 - `docs/SINIESTROS.md` — asistente, lectura de documentos y renegociación.

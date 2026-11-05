@@ -97,5 +97,12 @@ test('alta manual, documento privado y aislamiento sin sesión', async ({ page, 
   // Un navegador sin sesión no obtiene el documento
   const anonimo = await browser.newContext();
   expect((await anonimo.request.get(new URL(href, page.url()).toString())).status()).toBe(404);
+  for (const ruta of ['/api/exportar/polizas', '/api/exportar/poliza/00000000-0000-0000-0000-000000000000', '/api/siniestros/archivos/00000000-0000-0000-0000-000000000000']) {
+    expect((await anonimo.request.get(new URL(ruta, page.url()).toString())).status()).toBe(404);
+  }
+  const csv = await page.request.get('/api/exportar/polizas');
+  expect(csv.headers()['content-type']).toContain('text/csv');
+  expect(await csv.text()).toContain('Accidentes convenio (prueba e2e)');
+  expect((await page.request.get('/api/salud')).status()).toBe(200);
   await anonimo.close();
 });

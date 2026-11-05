@@ -40,5 +40,13 @@ export async function limpiar() {
     await almacen().borrar(d.clave_almacen);
     await q('UPDATE documentos SET purgado_en = now() WHERE id = $1', [d.id]);
   }
-  return { sesionesLimpiadas: sesiones.length, documentosPurgados: purgar.length };
+  const archivos = await q<{ id: string; clave_almacen: string }>(
+    `SELECT id, clave_almacen FROM siniestro_archivos WHERE eliminado_en < now() - make_interval(days => $1) AND purgado_en IS NULL LIMIT 100`,
+    [RETENCION_DOCUMENTOS_DIAS],
+  );
+  for (const a of archivos) {
+    await almacen().borrar(a.clave_almacen);
+    await q('UPDATE siniestro_archivos SET purgado_en = now() WHERE id = $1', [a.id]);
+  }
+  return { sesionesLimpiadas: sesiones.length, documentosPurgados: purgar.length + archivos.length };
 }

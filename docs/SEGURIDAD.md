@@ -28,9 +28,13 @@ Este documento describe las medidas aplicadas. **No declara cumplimiento normati
 - Los resultados se guardan en la base de datos con la lista de documentos usados; no se registran contenidos en los registros del servidor.
 - Retención en el proveedor: la que establezcan sus condiciones de API vigentes; el responsable debe revisarlas antes de usar datos reales, en especial **información de salud** (pólizas de salud o vida). Para no usar IA basta con no configurar la clave.
 
-## Pendiente (próximas entregas)
+## Copias y exportación
 
-- Copias automáticas cifradas de base de datos y documentos, retención configurable y restauración probada.
-- Exportación CSV por titular y paquete de expediente con permisos.
-- (Hecho en la entrega 2: purga de archivos eliminados tras 30 días y limpieza de sesiones caducadas desde el worker.)
-- Política de envío a IA (qué se envía, a quién y cómo desactivarlo) cuando se integre el proveedor.
+- Copia diaria cifrada (AES-256-GCM, clave `COPIAS_CLAVE` solo en el servidor y en el gestor de contraseñas del responsable) de la base de datos y los documentos; retención configurable (30 días). Restauración en base vacía probada automáticamente, incluida la no duplicación de avisos.
+- Las copias deben copiarse fuera del servidor (ver `docs/DESPLIEGUE.md`).
+- Exportación CSV (separador «;», sin fórmulas ejecutables) y ZIP por póliza o siniestro, siempre con los permisos del usuario y auditada. No incluye secretos ni datos de otros titulares.
+
+## Pendiente
+
+- Decidir el alojamiento y el destino externo de las copias.
+- Revisar las condiciones de tratamiento de datos de los proveedores (alojamiento, correo, IA) antes de cargar datos reales, en especial de salud.

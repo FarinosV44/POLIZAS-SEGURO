@@ -35,7 +35,8 @@ services:
     environment:
       DATABASE_URL: "postgres://${POSTGRES_USER:-polizas}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-polizas}"
       STORAGE_DIR: /datos/documentos
-    volumes: [documentos:/datos/documentos]
+      COPIAS_DIR: /datos/copias
+    volumes: [documentos:/datos/documentos, copias:/datos/copias]
     command: ["npm", "run", "worker"]
     depends_on: { migrar: { condition: service_completed_successfully } }
 
@@ -47,4 +48,4 @@ services:
     volumes: [caddy:/data]
     depends_on: [web]
 
-volumes: { db: {}, documentos: {}, caddy: {} }
+volumes: { db: {}, documentos: {}, copias: {}, caddy: {} }

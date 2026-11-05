@@ -51,6 +51,7 @@ export default async function FichaSiniestro({ params, searchParams }: { params:
         </div>
         <div className="acciones">
           <Link className="boton" href={`/siniestros/${id}/editar`}>Editar hechos</Link>
+          <a className="boton boton--sutil" href={`/api/exportar/siniestro/${id}`}>Descargar expediente</a>
           {polizas.find((p) => p.asistencia_telefono) && (
             <a className="boton boton--oscuro" href={`tel:${polizas.find((p) => p.asistencia_telefono)!.asistencia_telefono!.replace(/[^\d+]/g, '')}`}><IconoTelefono /> Asistencia</a>
           )}
