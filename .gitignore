@@ -12,15 +12,15 @@ next-env.d.ts
 !.env.example
 
 # Datos reales: documentos subidos, copias, exportaciones, volcados y registros
-datos/
-almacen/
-copias/
-exportaciones/
+/datos/
+/almacen/
+/copias/
+/exportaciones/
 *.dump
 *.sql.gz
 *.sqlite
 *.log
-logs/
+/logs/
 
 # Pólizas o documentos que se dejen en el árbol por error
 /*.pdf
